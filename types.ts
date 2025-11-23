@@ -1,28 +1,26 @@
-export enum FormatType {
-  VIDEO = 'VIDEO',
-  AUDIO = 'AUDIO'
-}
+import { LucideIcon } from 'lucide-react';
 
-export enum Quality {
-  HIGH = '1080p',
-  MEDIUM = '720p',
-  LOW = '480p',
-  AUDIO_HQ = '320kbps',
-  AUDIO_MQ = '192kbps'
-}
-
-export interface VideoMetadata {
-  id: string;
+export interface Service {
+  id: number;
   title: string;
-  author: string;
-  thumbnailUrl: string;
-  duration: string;
-  views: string;
+  description: string;
+  icon: LucideIcon;
 }
 
-export interface DownloadOption {
-  type: FormatType;
-  quality: Quality;
-  size: string;
-  extension: string;
+export interface NavItem {
+  label: string;
+  href: string;
+}
+
+export interface PortfolioItem {
+  id: number;
+  title: string;
+  category: string;
+  imageUrl: string;
+}
+
+export interface TechItem {
+  name: string;
+  icon: LucideIcon;
+  level: string;
 }
