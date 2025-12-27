@@ -1,26 +1,24 @@
-import { LucideIcon } from 'lucide-react';
-
-export interface Service {
-  id: number;
-  title: string;
-  description: string;
-  icon: LucideIcon;
-}
 
 export interface NavItem {
   label: string;
   href: string;
 }
 
-export interface PortfolioItem {
-  id: number;
+export interface ServiceItem {
+  id: string;
   title: string;
-  category: string;
-  imageUrl: string;
+  description: string;
+  icon: string;
+  gradient: string;
 }
 
-export interface TechItem {
-  name: string;
-  icon: LucideIcon;
-  level: string;
+export interface ProjectItem {
+  title: string;
+  category: string;
+  image: string;
+}
+
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
 }
