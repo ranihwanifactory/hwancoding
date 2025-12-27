@@ -5,11 +5,11 @@ import Hero from './components/Hero';
 import Services from './components/Services';
 import AIConsultant from './components/AIConsultant';
 import { PROJECTS } from './constants';
-import { Mail, Phone, ArrowUpRight, ArrowRight, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
+import { ArrowUpRight, ArrowRight, CircleCheck, Loader2, CircleAlert } from 'lucide-react';
 
 const App: React.FC = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
-  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
   const validateEmail = (email: string) => {
@@ -26,21 +26,21 @@ const App: React.FC = () => {
     // Validation
     if (!formData.name || !formData.email || !formData.message) {
       setErrorMessage('모든 필드를 입력해 주세요.');
-      setStatus('error');
+      setFormStatus('error');
       return;
     }
 
     if (!validateEmail(formData.email)) {
       setErrorMessage('유효한 이메일 주소를 입력해 주세요.');
-      setStatus('error');
+      setFormStatus('error');
       return;
     }
 
-    setStatus('submitting');
+    setFormStatus('submitting');
     setErrorMessage('');
     
     try {
-      // 사용자께서 제공하신 Formspree 고유 ID 'xojqdvyn' 연동
+      // Formspree 고유 엔드포인트 'xojqdvyn' 적용
       const response = await fetch('https://formspree.io/f/xojqdvyn', {
         method: 'POST',
         headers: {
@@ -56,22 +56,23 @@ const App: React.FC = () => {
       });
 
       if (response.ok) {
-        setStatus('success');
+        setFormStatus('success');
         setFormData({ name: '', email: '', message: '' });
       } else {
-        throw new Error('전송 중 서버 오류가 발생했습니다. 다시 시도해 주세요.');
+        const errorData = await response.json();
+        throw new Error(errorData.error || '전송 중 서버 오류가 발생했습니다.');
       }
     } catch (error: any) {
       console.error("Form Submission Error:", error);
       setErrorMessage(error.message || '시스템 오류로 인해 메시지를 보낼 수 없습니다.');
-      setStatus('error');
+      setFormStatus('error');
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    if (status === 'error') setStatus('idle');
+    if (formStatus === 'error') setFormStatus('idle');
   };
 
   return (
@@ -194,10 +195,10 @@ const App: React.FC = () => {
                 </div>
                 
                 <div className="w-full lg:w-[450px] relative">
-                   {status === 'success' ? (
+                   {formStatus === 'success' ? (
                      <div className="bg-white border border-black/5 rounded-[3rem] p-12 flex flex-col items-center text-center animate-in zoom-in duration-500 shadow-2xl">
                         <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-6">
-                           <CheckCircle className="w-10 h-10 text-emerald-500" />
+                           <CircleCheck className="w-10 h-10 text-emerald-500" />
                         </div>
                         <h3 className="text-2xl font-bold mb-4">전송 성공</h3>
                         <p className="text-black/50 mb-8 leading-relaxed">
@@ -205,7 +206,7 @@ const App: React.FC = () => {
                           검토 후 빠르게 연락드리겠습니다.
                         </p>
                         <button 
-                          onClick={() => setStatus('idle')}
+                          onClick={() => setFormStatus('idle')}
                           className="text-xs font-black uppercase tracking-widest border-b border-black pb-1 hover:text-black/40 transition-colors"
                         >
                           다시 작성하기
@@ -213,9 +214,9 @@ const App: React.FC = () => {
                      </div>
                    ) : (
                      <form className="space-y-4" onSubmit={handleSubmit}>
-                        {status === 'error' && (
+                        {formStatus === 'error' && (
                           <div className="bg-rose-50 border border-rose-100 p-4 rounded-xl flex items-center gap-3 text-rose-600 text-sm font-medium animate-in slide-in-from-top-2 duration-300">
-                             <AlertCircle className="w-4 h-4" />
+                             <CircleAlert className="w-4 h-4" />
                              {errorMessage}
                           </div>
                         )}
@@ -227,7 +228,7 @@ const App: React.FC = () => {
                             onChange={handleChange}
                             placeholder="성함" 
                             autoComplete="name"
-                            disabled={status === 'submitting'}
+                            disabled={formStatus === 'submitting'}
                             className="w-full bg-white border border-black/5 rounded-2xl px-6 py-4 text-sm font-medium focus:outline-none focus:border-black transition-all disabled:opacity-50" 
                           />
                         </div>
@@ -239,7 +240,7 @@ const App: React.FC = () => {
                             onChange={handleChange}
                             placeholder="이메일 주소" 
                             autoComplete="email"
-                            disabled={status === 'submitting'}
+                            disabled={formStatus === 'submitting'}
                             className="w-full bg-white border border-black/5 rounded-2xl px-6 py-4 text-sm font-medium focus:outline-none focus:border-black transition-all disabled:opacity-50" 
                           />
                         </div>
@@ -250,16 +251,16 @@ const App: React.FC = () => {
                             onChange={handleChange}
                             placeholder="문의 내용 (AI 시스템, 쇼핑몰, 브랜드 등)" 
                             rows={4} 
-                            disabled={status === 'submitting'}
+                            disabled={formStatus === 'submitting'}
                             className="w-full bg-white border border-black/5 rounded-2xl px-6 py-4 text-sm font-medium focus:outline-none focus:border-black transition-all disabled:opacity-50 resize-none"
                           ></textarea>
                         </div>
                         <button 
                           type="submit"
-                          disabled={status === 'submitting'}
+                          disabled={formStatus === 'submitting'}
                           className="w-full bg-black text-white py-5 rounded-2xl font-bold hover:bg-zinc-800 transition-all shadow-xl shadow-black/10 active:scale-95 disabled:bg-zinc-400 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
                         >
-                          {status === 'submitting' ? (
+                          {formStatus === 'submitting' ? (
                             <>
                               <Loader2 className="w-5 h-5 animate-spin" />
                               전송 중...
